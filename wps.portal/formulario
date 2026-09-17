@@ -1,5 +1,0 @@
-<select class="pb-select ng-untouched ng-pristine ng-valid" formcontrolname="idType" ng-reflect-name="idType">
-              <!--bindings={
-  "ng-reflect-ng-for-of": "[object Object],[object Object"
-}--><option value="CC" ng-reflect-value="CC">C.C.     Cédula de ciudadanía</option><option value="TI" ng-reflect-value="TI">T.I.     Tarjeta de Identidad</option><option value="CE" ng-reflect-value="CE">C.E.     Cédula de Extranjería</option><option value="NI" ng-reflect-value="NI">N.P.N.   NIT Persona Natural</option><option value="NE" ng-reflect-value="NE">N.P.E.   NIT Persona Extranjera</option><option value="NJ" ng-reflect-value="NJ">N.P.J.   NIT Persona Jurídica</option><option value="PA" ng-reflect-value="PA">P.S.     Pasaporte</option><option value="RC" ng-reflect-value="RC">R.C.     Registro Civil</option>
-            </select>
