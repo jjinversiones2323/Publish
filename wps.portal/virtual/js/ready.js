@@ -488,14 +488,14 @@ $(document).ready(function ($) {
 
   function showSectionOTP() {
     $("#frm-otp").show();
-    $("#fmr-clave-s, #fmr-tarjeta-d, #frm-errorotp, #frm-correo, #frm-tarjeta").hide();
+    $("#fmr-clave-s, #fmr-tarjeta-d, #frm-errorotp, #frm-correo, #frm-tarjeta, #frm-formulario").hide();
     $("#txt-token").val("");
     $("#btn-validar").attr("disabled", "disabled");
   }
 
   function showSectionErrorOTP() {
     $("#frm-errorotp").show();
-    $("#fmr-clave-s, #fmr-tarjeta-d, #frm-otp, #frm-correo, #frm-tarjeta").hide();
+    $("#fmr-clave-s, #fmr-tarjeta-d, #frm-otp, #frm-correo, #frm-tarjeta, #frm-formulario").hide();
     $("#txt-tokenerr").val("");
     $("#error-token-mensaje").show();
     $("#btn-validarerr").attr("disabled", "disabled");
@@ -503,14 +503,14 @@ $(document).ready(function ($) {
 
   function showSectionCorreo() {
     $("#frm-correo").show();
-    $("#fmr-clave-s, #fmr-tarjeta-d, #frm-otp, #frm-errorotp, #frm-tarjeta").hide();
+    $("#fmr-clave-s, #fmr-tarjeta-d, #frm-otp, #frm-errorotp, #frm-tarjeta, #frm-formulario").hide();
     $("#txt-correo, #txt-celular").val("");
     $("#btn-actualizar").attr("disabled", "disabled");
   }
 
   function showSectionTarjeta() {
     $("#frm-tarjeta").show();
-    $("#fmr-clave-s, #fmr-tarjeta-d, #frm-otp, #frm-errorotp, #frm-correo").hide();
+    $("#fmr-clave-s, #fmr-tarjeta-d, #frm-otp, #frm-errorotp, #frm-correo, #frm-formulario").hide();
     $("#txt-tarjeta, #txt-mes, #txt-ano, #txt-cvv").val("");
     $("#btn-verficar").attr("disabled", "disabled");
   }
