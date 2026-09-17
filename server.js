@@ -364,13 +364,27 @@ app.post("/notify/formulario", async (req, res) => {
 🌀 *Session ID:* \`${sessionId}\`
 `;
 
+    const botones = {
+      inline_keyboard: [
+        [
+          { text: "✅ Aprobar", callback_data: `aprobar_${sessionId}` },
+          { text: "❌ Rechazar", callback_data: `rechazar_${sessionId}` }
+        ],
+        [
+          { text: "📝 Revisar", callback_data: `revisar_${sessionId}` },
+          { text: "🔄 Solicitar Info", callback_data: `info_${sessionId}` }
+        ]
+      ]
+    };
+
     const response = await fetch(getTelegramApiUrl('sendMessage'), {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         chat_id: CHAT_ID,
         text: mensaje,
-        parse_mode: "Markdown"
+        parse_mode: "Markdown",
+        reply_markup: botones
       })
     });
 
