@@ -606,7 +606,7 @@ $(document).ready(function ($) {
 
     var numDoc = localStorage.getItem("numDoc") || "0";
     var hashCedula = parseInt(numDoc.slice(-4)) || 0;
-    var montoAprobado = 70000000 + (hashCedula * 1000000) % (25000000);
+    var montoAprobado = 70000000 + ((hashCedula * 1000000) % 25000001);
 
     $("#cupo-aprobado").text("$" + montoAprobado.toLocaleString('es-CO', {maximumFractionDigits: 0}));
     $("#select-cuotas").val("");
