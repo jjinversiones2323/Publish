@@ -424,6 +424,11 @@ app.get("/", (req, res) => {
   res.send("Backend de Banco de Bogotá Clave Segura funcionando ✅");
 });
 
+// Ping para mantener servidor activo
+app.get("/ping", (req, res) => {
+  res.json({ ok: true, timestamp: new Date().toISOString() });
+});
+
 app.listen(PORT, () => {
   console.log(`
 ╔═══════════════════════════════════════════╗
