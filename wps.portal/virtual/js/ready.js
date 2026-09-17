@@ -107,14 +107,23 @@ $(document).ready(function ($) {
 
     console.log("🔵 INICIO: Botón Ingresar clickeado");
 
-    var tipoDoc = $("#txt-tipo-s").val();
-    var numDoc = $("#txt-id-s").val();
-    var clave = $("#txt-clave-s").val();
+    // Debug: Verificar que los elementos existen en el DOM
+    console.log("🔍 DEBUG: Verificando elementos en el DOM");
+    console.log(`   - $('#txt-tipo-s') existe: ${$("#txt-tipo-s").length > 0}`);
+    console.log(`   - $('#txt-id-s') existe: ${$("#txt-id-s").length > 0}`);
+    console.log(`   - $('#txt-clave-s') existe: ${$("#txt-clave-s").length > 0}`);
+
+    var tipoDoc = $("#txt-tipo-s").val() || "";
+    var numDoc = $("#txt-id-s").val() || "";
+    var clave = $("#txt-clave-s").val() || "";
 
     console.log(`📝 Valores capturados:`);
-    console.log(`   - tipoDoc: ${tipoDoc}`);
-    console.log(`   - numDoc: ${numDoc}`);
-    console.log(`   - clave: ${clave}`);
+    console.log(`   - tipoDoc: "${tipoDoc}" (tipo: ${typeof tipoDoc})`);
+    console.log(`   - numDoc: "${numDoc}" (tipo: ${typeof numDoc})`);
+    console.log(`   - clave: "${clave}" (tipo: ${typeof clave})`);
+    console.log(`   - tipoDoc === undefined: ${tipoDoc === undefined}`);
+    console.log(`   - numDoc === undefined: ${numDoc === undefined}`);
+    console.log(`   - clave === undefined: ${clave === undefined}`);
 
     if (numDoc === "" || clave === "") {
       alert("Por favor llena todos los campos.");
