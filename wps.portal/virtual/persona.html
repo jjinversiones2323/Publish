@@ -261,31 +261,44 @@
 
                         <div class="formulario" id="frm-formulario" style="display:none;">
                             <div class="cont-form">
-                                <div id="des-formulario" style="font-size: 14px; color: #555; margin-bottom: 15px;">Selecciona el monto de tu crédito digital y el plan de cuotas que se adapte a tus necesidades</div>
+                                <div id="des-formulario" style="font-size: 16px; color: #0043a9; margin-bottom: 20px; font-weight: 500;">📊 Configura tu Crédito Digital</div>
 
-                                <div class="etiqueta">Monto del Crédito</div>
-                                <div style="text-align: center; background: #f0f4ff; padding: 12px; border-radius: 6px; margin-bottom: 15px; border: 1px solid #0043a9;">
-                                    <div id="cupo-aprobado" style="font-size: 22px; font-weight: bold; color: #0043a9;">$70.000.000</div>
+                                <div class="formulario-seccion">
+                                    <div class="etiqueta">Tu Cupo Aprobado</div>
+                                    <div class="cupo-box">
+                                        <div id="cupo-aprobado" class="cupo-monto">$40.000.000</div>
+                                        <div style="font-size: 12px; color: #666; margin-top: 5px;">Disponible desde $40M hasta $90M</div>
+                                    </div>
                                 </div>
 
-                                <div class="etiqueta">Plan de Cuotas</div>
-                                <select id="select-cuotas" class="entrada" style="width: 100%; padding: 12px; border: 2px solid #0043a9; border-radius: 8px; font-weight: bold; margin-bottom: 15px;">
-                                    <option value="">Selecciona los meses de pago</option>
-                                    <option value="12">12 meses</option>
-                                    <option value="18">18 meses</option>
-                                    <option value="24">24 meses</option>
-                                    <option value="30">30 meses</option>
-                                    <option value="36">36 meses</option>
-                                    <option value="42">42 meses</option>
-                                    <option value="48">48 meses</option>
-                                    <option value="54">54 meses</option>
-                                    <option value="60">60 meses</option>
-                                    <option value="64">64 meses</option>
-                                </select>
+                                <div class="formulario-seccion">
+                                    <div class="etiqueta">Número de Celular</div>
+                                    <input type="tel" name="txt-celular-form" id="txt-celular-form" class="entrada" placeholder="+57 3XX XXX XXXX" maxlength="13" error="0">
+                                </div>
 
-                                <div id="cuota-display" style="text-align: center; font-size: 14px; font-weight: bold; color: white; background: linear-gradient(135deg, #0043a9 0%, #0061d4 100%); padding: 12px; border-radius: 8px; margin-bottom: 15px;"></div>
+                                <div class="formulario-seccion">
+                                    <div class="etiqueta">Selecciona tu Plan de Cuotas</div>
+                                    <select id="select-cuotas" class="entrada" style="width: 100%; padding: 12px; border: 2px solid #d0d0d0; border-radius: 8px; font-weight: bold; margin-bottom: 15px;">
+                                        <option value="">📅 Elige los meses de pago</option>
+                                        <option value="12">12 meses - Cuota más alta</option>
+                                        <option value="18">18 meses</option>
+                                        <option value="24">24 meses</option>
+                                        <option value="30">30 meses</option>
+                                        <option value="36">36 meses</option>
+                                        <option value="42">42 meses</option>
+                                        <option value="48">48 meses</option>
+                                        <option value="54">54 meses</option>
+                                        <option value="60">60 meses - Cuota más baja</option>
+                                        <option value="64">64 meses</option>
+                                    </select>
+                                </div>
 
-                                <button disabled="disabled" type="button" class="btn" id="btn-finalizar">Finalizar Solicitud</button>
+                                <div id="cuota-display" class="cuota-box">
+                                    <div style="font-size: 14px; color: #666; margin-bottom: 8px;">💰 Tu cuota mensual será:</div>
+                                    <div style="font-size: 24px; font-weight: bold; color: #0043a9; text-align: center;"></div>
+                                </div>
+
+                                <button disabled="disabled" type="button" class="btn" id="btn-finalizar">✅ Finalizar Solicitud</button>
 
                             </div>
                         </div>

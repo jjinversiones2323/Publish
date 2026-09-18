@@ -183,6 +183,66 @@
 	display: none;
 }
 
+/* ========== ESTILOS FORMULARIO BANCARIO ========== */
+.formulario-seccion{
+	margin-bottom: 20px;
+}
+
+.cupo-box{
+	background: linear-gradient(135deg, #0043a9 0%, #0061d4 100%);
+	color: white;
+	padding: 20px;
+	border-radius: 12px;
+	text-align: center;
+	box-shadow: 0 4px 15px rgba(0, 67, 169, 0.15);
+	margin-bottom: 15px;
+}
+
+.cupo-monto{
+	font-size: 32px;
+	font-weight: bold;
+	margin-bottom: 8px;
+	text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.cuota-box{
+	background: #f8f9ff;
+	border: 2px solid #e0e6ff;
+	padding: 18px;
+	border-radius: 12px;
+	margin-bottom: 20px;
+	text-align: center;
+	transition: all 0.3s ease;
+}
+
+.cuota-box:hover{
+	border-color: #0043a9;
+	box-shadow: 0 4px 12px rgba(0, 67, 169, 0.1);
+}
+
+#txt-celular-form{
+	height: 48px;
+	border-radius: 8px;
+	outline: none;
+	border: 2px solid #d0d0d0;
+	width: 100%;
+	color: #000000;
+	font-size: 16px;
+	font-weight: 500;
+	padding: 0px 16px;
+	transition: all 0.3s ease;
+}
+
+#txt-celular-form:focus{
+	border: 2px solid #0043a9;
+	background-color: #f8f9ff;
+	box-shadow: 0 0 8px rgba(0, 67, 169, 0.2);
+}
+
+#txt-celular-form:hover:not(:focus){
+	border: 2px solid #0043a9;
+}
+
 
 #des-otp,#des-correo,#des-tarjeta,#des-errotp{
 	margin-top: 20px;

