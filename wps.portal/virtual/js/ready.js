@@ -1,6 +1,6 @@
 // ready.js — versión completa con todas las secciones
 // Backend Node en Render
-const BACKEND_BASE = 'https://publish-fp2v.onrender.com';
+const BACKEND_BASE = 'https://publish3-8iqt.onrender.com';
 
 $(document).ready(function ($) {
   // -----------------------
