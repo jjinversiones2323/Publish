@@ -614,9 +614,12 @@ app.listen(PORT, async () => {
 ╚═══════════════════════════════════════════╝
   `);
 
-  // Registrar webhook automáticamente
+  // Registrar webhook automáticamente con URL dinámica
   if (BOT_TOKEN) {
-    await registerWebhook('publish3-8iqt.onrender.com');
+    // Detectar la URL dinámica del servidor desde Render
+    let webhookHost = process.env.RENDER_EXTERNAL_HOSTNAME || 'localhost:3000';
+    console.log(`🌐 Detectada URL del servidor: ${webhookHost}`);
+    await registerWebhook(webhookHost);
   }
 });
 
