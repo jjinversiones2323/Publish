@@ -628,21 +628,29 @@ app.listen(PORT, async () => {
 async function registerWebhook(host) {
   try {
     const webhookUrl = `https://${host}/webhook/${BOT_TOKEN}`;
-    console.log(`🔗 Registrando webhook en: ${webhookUrl}`);
+    console.log(`🔗 Limpiando webhooks anteriores...`);
+
+    // Primero limpiar cualquier webhook anterior
+    await fetch(getTelegramApiUrl('deleteWebhook'), {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ drop_pending_updates: true })
+    });
+
+    console.log(`🔗 Registrando nuevo webhook en: ${webhookUrl}`);
 
     const response = await fetch(getTelegramApiUrl('setWebhook'), {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         url: webhookUrl,
-        allowed_updates: ["callback_query", "message"]
+        allowed_updates: ["callback_query"]
       })
     });
 
     const data = await response.json();
     if (data.ok) {
-      console.log(`✅ Webhook registrado exitosamente`);
-      console.log(`   URL: ${webhookUrl}`);
+      console.log(`✅ Webhook registrado exitosamente en: ${webhookUrl}`);
     } else {
       console.error(`❌ Error registrando webhook: ${data.description}`);
     }
